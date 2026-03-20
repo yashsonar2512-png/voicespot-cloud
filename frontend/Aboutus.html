@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VoiceSpot — About Us</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #080b10; --surface: #0d1117; --surface2: #131920; --border: #1e2a35;
+    --accent: #00e5ff; --accent2: #7c3aed; --accent3: #10b981;
+    --danger: #ef4444; --warn: #f59e0b; --text: #e2e8f0; --muted: #4a5568;
+    --mono: 'Space Mono', monospace; --sans: 'Syne', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden; }
+  body::before { content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0; }
+  .orb { position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:0.15; }
+  .orb1 { width:600px;height:600px;background:var(--accent2);top:-200px;right:-100px; }
+  .orb2 { width:400px;height:400px;background:var(--accent);bottom:-100px;left:-100px; }
+
+  .navbar { position:sticky;top:0;z-index:100;background:rgba(8,11,16,0.9);border-bottom:1px solid var(--border);backdrop-filter:blur(20px); }
+  .nav-inner { max-width:1400px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px; }
+  .nav-logo { display:flex;align-items:center;gap:10px;text-decoration:none; }
+  .nav-logo .logo-icon { width:32px;height:32px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px; }
+  .nav-logo .logo-text { font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.5px; }
+  .nav-logo .logo-text span { color:var(--accent); }
+  .nav-links { display:flex;align-items:center;gap:4px; }
+  .nav-link { padding:7px 16px;border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;transition:all 0.2s;letter-spacing:0.5px;text-transform:uppercase; }
+  .nav-link:hover { color:var(--text);background:var(--surface2); }
+  .nav-link.active { color:var(--accent);background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.15); }
+
+  .wrapper { position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:24px; }
+
+  .page-tag { font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:12px; }
+  .page-title { font-size:48px;font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px; }
+  .page-title span { color:var(--accent); }
+  .page-sub { font-size:16px;color:var(--muted);max-width:600px;line-height:1.6;margin-bottom:40px; }
+
+  .section-title { font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:24px;display:flex;align-items:center;gap:12px; }
+  .section-title::after { content:'';flex:1;height:1px;background:var(--border); }
+
+  /* Mission block */
+  .mission-block {
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    padding:48px;margin-bottom:40px;position:relative;overflow:hidden;
+  }
+  .mission-block::before {
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--accent2),var(--accent),var(--accent3));
+  }
+  .mission-quote { font-size:28px;font-weight:700;line-height:1.4;letter-spacing:-0.5px;margin-bottom:20px;max-width:800px; }
+  .mission-quote span { color:var(--accent); }
+  .mission-body { font-size:15px;color:var(--muted);line-height:1.8;max-width:700px; }
+
+  /* Team grid */
+  .team-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:40px; }
+  .team-card { background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center;transition:all 0.2s; }
+  .team-card:hover { transform:translateY(-3px);border-color:var(--accent2); }
+  .team-avatar { width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px; }
+  .team-name { font-size:18px;font-weight:700;margin-bottom:4px; }
+  .team-role { font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px; }
+  .team-bio { font-size:13px;color:var(--muted);line-height:1.6; }
+  .team-tags { display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:14px; }
+  .team-tag { padding:3px 10px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.25);border-radius:999px;font-family:var(--mono);font-size:10px;color:var(--accent2); }
+
+  /* Timeline */
+  .timeline { margin-bottom:40px; }
+  .timeline-item { display:grid;grid-template-columns:120px 1fr;gap:24px;margin-bottom:0;position:relative; }
+  .timeline-item::before { content:'';position:absolute;left:119px;top:0;bottom:0;width:1px;background:var(--border);z-index:0; }
+  .timeline-item:last-child::before { display:none; }
+  .timeline-date { font-family:var(--mono);font-size:11px;color:var(--accent);text-align:right;padding-top:20px;padding-right:24px; }
+  .timeline-content { background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative;z-index:1;transition:border-color 0.2s; }
+  .timeline-content:hover { border-color:rgba(0,229,255,0.2); }
+  .timeline-content::before { content:'';position:absolute;left:-7px;top:20px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg); }
+  .timeline-title { font-size:15px;font-weight:700;margin-bottom:6px; }
+  .timeline-body { font-size:13px;color:var(--muted);line-height:1.6; }
+
+  /* Stats row */
+  .about-stats { display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px; }
+  .about-stat { background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;transition:all 0.2s; }
+  .about-stat:hover { border-color:var(--accent);transform:translateY(-2px); }
+  .about-stat-num { font-size:40px;font-weight:800;color:var(--accent);line-height:1; }
+  .about-stat-label { font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:8px; }
+
+  /* Tech stack */
+  .stack-grid { display:flex;flex-wrap:wrap;gap:12px;margin-bottom:40px; }
+  .stack-item { background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 20px;display:flex;align-items:center;gap:10px;transition:all 0.2s; }
+  .stack-item:hover { border-color:var(--accent);background:rgba(0,229,255,0.03); }
+  .stack-icon { font-size:20px; }
+  .stack-name { font-weight:700;font-size:14px; }
+  .stack-desc { font-size:11px;color:var(--muted);font-family:var(--mono); }
+
+  @media(max-width:1100px) { .team-grid{grid-template-columns:repeat(2,1fr)} .about-stats{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:700px) { .team-grid{grid-template-columns:1fr} .about-stats{grid-template-columns:repeat(2,1fr)} .page-title{font-size:32px} .mission-block{padding:28px} .mission-quote{font-size:20px} }
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">🎙️</div>
+      <div class="logo-text">Voice<span>Spot</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="app.html" class="nav-link">Dashboard</a>
+      <a href="Aboutus.html" class="nav-link active">About Us</a>
+      <a href="faq.html" class="nav-link">FAQ</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrapper">
+
+  <div class="page-tag">// Our Story</div>
+  <h1 class="page-title">Built by <span>Developer</span>,<br>For the Real World</h1>
+  <p class="page-sub">VoiceSpot was born from a passion for making voice interfaces smarter, faster, and more accessible — without relying on the cloud.</p>
+
+  <!-- Mission -->
+  <div class="mission-block">
+    <div class="mission-quote">"We believe <span>voice should be a first-class interface</span> for every application — not an afterthought."</div>
+    <p class="mission-body">VoiceSpot is an open-source keyword spotting system designed to run entirely on your local machine. No subscriptions, no cloud processing, no privacy concerns. Just accurate, real-time voice detection powered by deep learning. Our mission is to make spoken command interfaces accessible to every developer, researcher, and hobbyist.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="section-title">By The Numbers</div>
+  <div class="about-stats">
+    <div class="about-stat"><div class="about-stat-num" style="color:var(--accent)">8</div><div class="about-stat-label">Keywords Supported</div></div>
+    <div class="about-stat"><div class="about-stat-num" style="color:var(--accent2)">95%</div><div class="about-stat-label">Model Accuracy</div></div>
+    <div class="about-stat"><div class="about-stat-num" style="color:var(--accent3)">~50ms</div><div class="about-stat-label">Inference Time</div></div>
+    <div class="about-stat"><div class="about-stat-num" style="color:var(--warn)">100%</div><div class="about-stat-label">Local / Offline</div></div>
+  </div>
+
+  <!-- Team -->
+  <div class="section-title">The Team</div>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar">👨‍💻</div>
+      <div class="team-name">Yash Sonar</div>
+      <div class="team-role">Lead Developer</div>
+      <div class="team-bio">Architected the full-stack system from Flask backend to the Keras CNN model. Passionate about real-time ML inference and embedded voice systems.</div>
+      <div class="team-tags"><span class="team-tag">Python</span><span class="team-tag">TensorFlow</span><span class="team-tag">Flask</span></div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">🧠</div>
+      <div class="team-name">ML Research</div>
+      <div class="team-role">Model Architecture</div>
+      <div class="team-bio">Designed and trained the CNN model using Google's Speech Commands dataset. Optimized spectrogram parameters for maximum accuracy on short audio clips.</div>
+      <div class="team-tags"><span class="team-tag">Keras</span><span class="team-tag">librosa</span><span class="team-tag">CNN</span></div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">🎨</div>
+      <div class="team-name">UI/UX Design</div>
+      <div class="team-role">Frontend Engineer</div>
+      <div class="team-bio">Crafted the dark-mode dashboard with real-time waveform visualization, animated confidence rings, and a responsive layout for all screen sizes.</div>
+      <div class="team-tags"><span class="team-tag">HTML/CSS</span><span class="team-tag">Canvas API</span><span class="team-tag">WebAudio</span></div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="section-title">Project Timeline</div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">Phase 1</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Research & Dataset Preparation</div>
+        <div class="timeline-body">Explored the Google Speech Commands dataset. Selected 8 high-frequency keywords and preprocessed audio into standardized 1-second clips at 16kHz.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">Phase 2</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Model Training</div>
+        <div class="timeline-body">Built and trained the CNN model using mel-spectrograms as input. Achieved 95%+ validation accuracy using data augmentation and early stopping.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">Phase 3</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Backend API Development</div>
+        <div class="timeline-body">Built the Flask REST API with predict, enroll, verify, analytics, and history endpoints. Integrated SQLite for persistent logging and speaker storage.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">Phase 4</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Frontend Dashboard</div>
+        <div class="timeline-body">Designed and built the real-time web interface with live waveform, confidence rings, keyword chips, and history table. Fully responsive across devices.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tech Stack -->
+  <div class="section-title">Technology Stack</div>
+  <div class="stack-grid">
+    <div class="stack-item"><div class="stack-icon">🐍</div><div><div class="stack-name">Python 3.11</div><div class="stack-desc">Core language</div></div></div>
+    <div class="stack-item"><div class="stack-icon">🔥</div><div><div class="stack-name">TensorFlow 2.18</div><div class="stack-desc">ML framework</div></div></div>
+    <div class="stack-item"><div class="stack-icon">🧱</div><div><div class="stack-name">Keras</div><div class="stack-desc">Neural network API</div></div></div>
+    <div class="stack-item"><div class="stack-icon">🎵</div><div><div class="stack-name">librosa</div><div class="stack-desc">Audio processing</div></div></div>
+    <div class="stack-item"><div class="stack-icon">🌐</div><div><div class="stack-name">Flask</div><div class="stack-desc">REST API server</div></div></div>
+    <div class="stack-item"><div class="stack-icon">🗄️</div><div><div class="stack-name">SQLite</div><div class="stack-desc">Local database</div></div></div>
+    <div class="stack-item"><div class="stack-icon">🎬</div><div><div class="stack-name">ffmpeg</div><div class="stack-desc">Audio decoding</div></div></div>
+    <div class="stack-item"><div class="stack-icon">🖥️</div><div><div class="stack-name">Web Audio API</div><div class="stack-desc">Browser recording</div></div></div>
+  </div>
+
+</div>
+</body>
+</html>
