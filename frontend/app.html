@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VoiceSpot — Keyword Intelligence System</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#080b10;--surface:#0d1117;--surface2:#131920;--border:#1e2a35;--accent:#00e5ff;--accent2:#7c3aed;--accent3:#10b981;--danger:#ef4444;--warn:#f59e0b;--text:#e2e8f0;--muted:#4a5568;--mono:'Space Mono',monospace;--sans:'Syne',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.12;}
+.orb1{width:500px;height:500px;background:var(--accent2);top:-150px;right:-80px;}
+.orb2{width:350px;height:350px;background:var(--accent);bottom:-80px;left:-80px;}
+.navbar{position:sticky;top:0;z-index:100;background:rgba(8,11,16,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);}
+.nav-inner{max-width:1400px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.logo-text{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.5px;}
+.logo-text span{color:var(--accent);}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-link{padding:7px 16px;border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;transition:all .2s;text-transform:uppercase;letter-spacing:.5px;}
+.nav-link:hover,.nav-link.active{color:var(--accent);}
+.status-pill{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--danger);}
+.dot.on{background:var(--accent3);box-shadow:0 0 8px var(--accent3);}
+.wrapper{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:24px;}
+.header-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;}
+.header-left{display:flex;align-items:center;gap:16px;}
+.header-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.header-title{font-size:26px;font-weight:800;letter-spacing:-.5px;}
+.header-sub{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:2px;}
+.engine-badges{display:flex;gap:8px;}
+.engine-badge{padding:6px 14px;border-radius:8px;font-family:var(--mono);font-size:11px;border:1px solid;}
+.engine-badge.cnn{border-color:rgba(0,229,255,.3);color:var(--accent);}
+.engine-badge.whisper{border-color:rgba(124,58,237,.3);color:var(--accent2);}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.stat-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;}
+.stat-value{font-size:32px;font-weight:800;}
+.tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:6px;flex-wrap:wrap;}
+.tab{flex:1;min-width:100px;padding:10px;border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer;border:none;background:transparent;text-transform:uppercase;letter-spacing:.5px;transition:all .2s;}
+.tab.active{background:var(--accent);color:#000;font-weight:700;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;}
+.card-title{font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'—';opacity:.5;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.input-group{margin-bottom:16px;}
+.input-label{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.inp{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .2s;}
+.inp:focus{border-color:var(--accent);}
+.inp::placeholder{color:var(--muted);}
+.btn{padding:10px 20px;border-radius:10px;font-family:var(--mono);font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .2s;letter-spacing:.5px;text-transform:uppercase;}
+.btn-primary{background:var(--accent);color:#000;}
+.btn-primary:hover{background:#00c4d9;}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-purple{background:rgba(124,58,237,.2);color:var(--accent2);border:1px solid rgba(124,58,237,.3);}
+.btn-green{background:rgba(16,185,129,.15);color:var(--accent3);border:1px solid rgba(16,185,129,.3);}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.3);}
+.btn-full{width:100%;}
+.btn-lg{padding:14px 28px;font-size:13px;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.mic-container{display:flex;flex-direction:column;align-items:center;gap:16px;padding:16px 0;}
+.mic-btn{width:90px;height:90px;border-radius:50%;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:32px;transition:all .3s;background:var(--surface2);position:relative;}
+.mic-btn.recording{border-color:var(--danger);background:rgba(239,68,68,.1);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.mic-status{font-family:var(--mono);font-size:12px;color:var(--muted);}
+.waveform{width:100%;height:44px;background:var(--surface2);border-radius:8px;}
+.result-box{min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
+.result-keyword{font-size:48px;font-weight:800;letter-spacing:-2px;color:var(--accent);}
+.result-confidence{font-family:var(--mono);font-size:13px;color:var(--muted);}
+.engine-tag{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:999px;font-weight:700;}
+.engine-tag.cnn{background:rgba(0,229,255,.1);color:var(--accent);border:1px solid rgba(0,229,255,.2);}
+.engine-tag.whisper{background:rgba(124,58,237,.1);color:var(--accent2);border:1px solid rgba(124,58,237,.2);}
+.watchlist-alert{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:8px 14px;font-family:var(--mono);font-size:12px;color:var(--danger);margin-top:6px;}
+.confidence-bar{width:100%;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:4px;}
+.confidence-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width .5s;}
+.all-preds{width:100%;margin-top:12px;}
+.pred-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--border);}
+.pred-kw{font-family:var(--mono);font-size:11px;width:64px;color:var(--muted);}
+.pred-bar-wrap{flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.pred-bar{height:100%;background:var(--accent2);border-radius:3px;}
+.pred-pct{font-family:var(--mono);font-size:10px;color:var(--muted);width:38px;text-align:right;}
+.placeholder-text{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;line-height:1.8;}
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;}
+.upload-zone:hover{border-color:var(--accent);background:rgba(0,229,255,.03);}
+.upload-zone input{display:none;}
+.upload-icon{font-size:32px;margin-bottom:10px;}
+.upload-text{font-family:var(--mono);font-size:12px;color:var(--muted);}
+.upload-text strong{color:var(--accent);}
+.progress-wrap{background:var(--surface2);border-radius:999px;height:8px;overflow:hidden;margin:8px 0;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:999px;transition:width .5s;}
+.watchlist-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);font-family:var(--mono);font-size:12px;color:var(--danger);margin:4px;}
+.watchlist-chip button{background:none;border:none;cursor:pointer;color:var(--danger);font-size:14px;padding:0 0 0 4px;line-height:1;}
+.kw-chip{display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-family:var(--mono);font-size:11px;border:1px solid var(--border);color:var(--muted);margin:3px;background:var(--surface);}
+.kw-chip.cnn-kw{border-color:rgba(0,229,255,.25);color:var(--accent);}
+.kw-chip.whisper-kw{border-color:rgba(124,58,237,.25);color:var(--accent2);}
+.detection-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.found-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-family:var(--mono);font-size:13px;font-weight:700;margin-bottom:16px;}
+.found-badge.yes{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--accent3);}
+.found-badge.no{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger);}
+.transcript-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:14px;line-height:1.8;color:var(--text);margin-top:12px;max-height:200px;overflow-y:auto;}
+.history-table{width:100%;border-collapse:collapse;}
+.history-table th{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.history-table td{padding:10px 12px;font-family:var(--mono);font-size:12px;border-bottom:1px solid var(--border);}
+.history-table tr:hover td{background:var(--surface2);}
+.alert-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
+.al1{background:rgba(74,85,104,.3);color:#a0aec0;}
+.al3{background:rgba(245,158,11,.2);color:var(--warn);}
+.al4,.al5{background:rgba(239,68,68,.2);color:var(--danger);}
+.info-box{background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:10px;padding:16px;font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;}
+.info-box strong{color:var(--accent);}
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;}
+.toast{padding:12px 18px;border-radius:10px;font-family:var(--mono);font-size:12px;border:1px solid;animation:slideIn .3s ease;max-width:360px;}
+.toast.success{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4);color:var(--accent3);}
+.toast.error{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:var(--danger);}
+.toast.info{background:rgba(0,229,255,.1);border-color:rgba(0,229,255,.3);color:var(--accent);}
+@keyframes slideIn{from{transform:translateX(60px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="logo-icon">🎙️</div>
+      <div class="logo-text">Voice<span>Spot</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="app.html" class="nav-link active">Dashboard</a>
+      <a href="Aboutus.html" class="nav-link">About</a>
+      <a href="faq.html" class="nav-link">FAQ</a>
+    </div>
+    <div class="status-pill">
+      <div class="dot" id="statusDot"></div>
+      <span id="statusText" style="font-family:var(--mono);font-size:11px;">Connecting...</span>
+    </div>
+  </div>
+</nav>
+
+<div class="wrapper">
+  <div class="header-panel">
+    <div class="header-left">
+      <div class="header-icon">🎙️</div>
+      <div>
+        <div class="header-title">VoiceSpot</div>
+        <div class="header-sub">Keyword Intelligence System v4.0 — Dual Engine</div>
+      </div>
+    </div>
+    <div class="engine-badges">
+      <div class="engine-badge cnn" id="cnnBadge">CNN: checking...</div>
+      <div class="engine-badge whisper" id="whisperBadge">Whisper: checking...</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Total Predictions</div><div class="stat-value" style="color:var(--accent)" id="statTotal">0</div></div>
+    <div class="stat-card"><div class="stat-label">Watchlist Words</div><div class="stat-value" style="color:var(--danger)" id="statWatch">0</div></div>
+    <div class="stat-card"><div class="stat-label">Alerts Triggered</div><div class="stat-value" style="color:var(--warn)" id="statAlerts">0</div></div>
+    <div class="stat-card"><div class="stat-label">CNN Keywords</div><div class="stat-value" style="color:var(--accent2)" id="statKw">0</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('predict',this)">🎯 Predict</button>
+    <button class="tab" onclick="switchTab('watchlist',this)">🔴 Watchlist</button>
+    <button class="tab" onclick="switchTab('search',this)">🔍 Search Audio</button>
+    <button class="tab" onclick="switchTab('train',this)">🧠 Train / Upload</button>
+    <button class="tab" onclick="switchTab('history',this)">📊 History</button>
+  </div>
+
+  <!-- ══════════════════════ PREDICT ══════════════════════ -->
+  <div class="tab-panel active" id="tab-predict">
+    <div class="info-box">
+      <strong>Dual-Engine System:</strong> Your CNN model handles the 8 trained keywords fast.
+      For any other word (dishoom, drum, etc.), <strong>Whisper AI</strong> automatically
+      transcribes it — no training, no audio samples needed.
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Voice Recording</div>
+        <div class="mic-container">
+          <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎙️</button>
+          <div class="mic-status" id="micStatus">Click to start recording</div>
+          <canvas class="waveform" id="waveformCanvas"></canvas>
+        </div>
+        <div class="input-group" style="margin-top:8px;">
+          <div class="input-label">Speaker Name</div>
+          <input class="inp" id="speakerName" placeholder="optional..."/>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-lg" onclick="sendPredict()" id="predictBtn">Predict Keyword</button>
+          <button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+        </div>
+        <div style="margin-top:16px;">
+          <div class="input-label" style="margin-bottom:8px;">Or Upload Audio File</div>
+          <div class="upload-zone" onclick="document.getElementById('audioUpload').click()">
+            <input type="file" id="audioUpload" accept="audio/*" onchange="handleAudioUpload(this)"/>
+            <div class="upload-icon">📁</div>
+            <div class="upload-text" id="uploadFileName">Drop audio file or click<br/><strong>WAV, MP3, WebM supported</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Prediction Result</div>
+        <div class="result-box" id="resultBox">
+          <div class="placeholder-text">Record or upload audio,<br/>then click Predict</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ WATCHLIST ══════════════════════ -->
+  <div class="tab-panel" id="tab-watchlist">
+    <div class="info-box">
+      <strong>Watchlist = words to alert on.</strong><br/>
+      Add any word here — <strong>no audio samples needed at all.</strong>
+      Whisper AI will automatically detect it whenever someone says it.
+      Example: add "drum", "dishoom", "crossconnection" — system alerts immediately when spoken.
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Add Word to Watchlist</div>
+        <div class="input-group">
+          <div class="input-label">Keyword to Watch For</div>
+          <input class="inp" id="watchlistInput" placeholder="e.g. drum, dishoom, danger..." onkeydown="if(event.key==='Enter')addToWatchlist()"/>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7;">
+          Type any word and click Add. The system will immediately start alerting whenever
+          this word is detected in any audio — even in Chinese, Hindi, or any other language.
+        </p>
+        <button class="btn btn-danger btn-full btn-lg" onclick="addToWatchlist()">+ Add to Watchlist</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Current Watchlist</div>
+        <div id="watchlistDisplay">
+          <div class="placeholder-text">No words in watchlist yet.<br/>Add words on the left.</div>
+        </div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+          <div class="card-title" style="margin-bottom:12px;">CNN Trained Keywords</div>
+          <div id="cnnKeywordsDisplay"></div>
+          <p style="font-size:12px;color:var(--muted);margin-top:8px;font-family:var(--mono);">These use your trained CNN model for fast prediction.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ SEARCH ══════════════════════ -->
+  <div class="tab-panel" id="tab-search">
+    <div class="info-box">
+      <strong>Search any word in any audio file.</strong><br/>
+      Upload a recording (phone call, lecture, Chinese transcript, etc.),
+      type the word you want to find, and the system tells you exactly when it appears.
+      Whisper transcribes the entire file first, then searches — works for ANY language.
+    </div>
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div>
+        <div class="input-group">
+          <div class="input-label">Keyword to Search For</div>
+          <input class="inp" id="searchKeyword" placeholder="e.g. drum, hello, stop..."/>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;">Leave blank to get full transcript of entire file.</div>
+        </div>
+        <button class="btn btn-primary btn-lg btn-full" id="searchBtn" onclick="runSearch()">🔍 Search in Audio</button>
+      </div>
+      <div>
+        <div class="input-label" style="margin-bottom:8px;">Audio File to Search</div>
+        <div class="upload-zone" onclick="document.getElementById('searchUpload').click()" id="searchZone">
+          <input type="file" id="searchUpload" accept="audio/*" onchange="handleSearchUpload(this)"/>
+          <div class="upload-icon">🎵</div>
+          <div class="upload-text" id="searchUploadText">Upload audio file<br/><strong>Any length, any language</strong></div>
+        </div>
+      </div>
+    </div>
+    <div id="searchResults" style="display:none;">
+      <div class="card">
+        <div class="card-title">Search Results</div>
+        <div id="searchResultsContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ TRAIN ══════════════════════ -->
+  <div class="tab-panel" id="tab-train">
+    <div class="info-box">
+      <strong>Two ways to add a new keyword:</strong><br/>
+      <strong>Option A (no samples):</strong> Just type the word → click "Add to Watchlist Only". Whisper detects it instantly.<br/>
+      <strong>Option B (with samples):</strong> Upload 10+ audio files → click "Upload &amp; Retrain CNN". CNN learns to predict it with high speed.
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Add New Keyword</div>
+        <div class="input-group">
+          <div class="input-label">New Keyword</div>
+          <input class="inp" id="newKeyword" placeholder="e.g. drum, dishoom, hello..."/>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Audio Samples (optional — for CNN training)</div>
+          <div class="upload-zone" onclick="document.getElementById('sampleFiles').click()">
+            <input type="file" id="sampleFiles" accept="audio/*" multiple onchange="handleSampleFiles(this)"/>
+            <div class="upload-icon">🎙️</div>
+            <div class="upload-text" id="sampleText">Upload .wav audio samples<br/><strong>10+ files recommended for CNN training</strong></div>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:12px;">
+          <button class="btn btn-danger" onclick="addKeywordWatchlistOnly()" id="addWatchBtn">+ Watchlist Only (instant)</button>
+          <button class="btn btn-purple" onclick="addKeywordWithTraining()" id="addTrainBtn">☁️ Upload &amp; Retrain CNN</button>
+        </div>
+        <div id="addKwMsg" style="margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--muted);"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Training Status</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="font-family:var(--mono);font-size:13px;margin-bottom:8px;" id="trainMsg">Idle</div>
+          <div class="progress-wrap"><div class="progress-fill" id="trainBar" style="width:0%"></div></div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px;" id="trainPct">0%</div>
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary btn-full" onclick="triggerRetrain()">🔄 Retrain CNN with All Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ HISTORY ══════════════════════ -->
+  <div class="tab-panel" id="tab-history">
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Prediction History</span>
+        <button class="btn btn-secondary" onclick="loadHistory()" style="padding:5px 12px;font-size:11px;">Refresh</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="history-table">
+          <thead>
+            <tr><th>Time</th><th>Keyword</th><th>Transcript</th><th>Confidence</th><th>Engine</th><th>Speaker</th><th>Alert</th></tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────
+const API_URL = 'http://localhost:5000';
+
+// ── STATE ────────────────────────────────────────────────────
+let mediaRecorder = null, audioChunks = [], recordedBlob = null, uploadedBlob = null;
+let searchBlob = null, sampleFiles = [];
+let audioCtx = null, analyser = null, animFrame = null;
+let trainPoll = null;
+
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  checkStatus();
+  setInterval(checkStatus, 15000);
+  setInterval(pollTrainStatus, 3000);
+  loadHistory();
+});
+
+// ── STATUS ───────────────────────────────────────────────────
+async function checkStatus() {
+  try {
+    const r = await fetch(`${API_URL}/status`, {signal: AbortSignal.timeout(5000)});
+    const d = await r.json();
+    document.getElementById('statusDot').classList.add('on');
+    document.getElementById('statusText').textContent = 'Online';
+    document.getElementById('cnnBadge').textContent   = d.cnn_loaded   ? 'CNN: ✅ Ready' : 'CNN: ❌ No model';
+    document.getElementById('whisperBadge').textContent = d.whisper_ready ? 'Whisper: ✅ Ready' : 'Whisper: ⚠️ Not installed';
+    document.getElementById('statKw').textContent    = (d.keywords  || []).length;
+    document.getElementById('statWatch').textContent = (d.watchlist || []).length;
+    renderWatchlist(d.watchlist || []);
+    renderCnnKeywords(d.keywords || []);
+  } catch {
+    document.getElementById('statusDot').classList.remove('on');
+    document.getElementById('statusText').textContent = 'Offline';
+  }
+}
+
+// ── TABS ─────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'history') loadHistory();
+}
+
+// ── RECORDING ────────────────────────────────────────────────
+async function toggleRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    document.getElementById('micBtn').classList.remove('recording');
+    document.getElementById('micBtn').textContent = '🎙️';
+  } else {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+      setupWaveform(stream);
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
+      mediaRecorder.onstop = () => {
+        recordedBlob = new Blob(audioChunks, {type:'audio/webm'});
+        document.getElementById('micStatus').textContent = '✅ Recorded — ready to predict';
+        stream.getTracks().forEach(t=>t.stop());
+        if(animFrame) cancelAnimationFrame(animFrame);
+      };
+      mediaRecorder.start(100);
+      document.getElementById('micBtn').classList.add('recording');
+      document.getElementById('micBtn').textContent = '⏹️';
+      document.getElementById('micStatus').textContent = '🔴 Recording...';
+    } catch { toast('Microphone access denied', 'error'); }
+  }
+}
+
+function setupWaveform(stream) {
+  audioCtx = new AudioContext(); analyser = audioCtx.createAnalyser();
+  audioCtx.createMediaStreamSource(stream).connect(analyser);
+  analyser.fftSize = 256;
+  const canvas = document.getElementById('waveformCanvas');
+  const ctx = canvas.getContext('2d');
+  const buf = new Uint8Array(analyser.frequencyBinCount);
+  (function draw() {
+    animFrame = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(buf);
+    ctx.fillStyle = '#131920'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    const bw = canvas.width/buf.length;
+    buf.forEach((v,i)=>{
+      const h=(v/255)*canvas.height;
+      ctx.fillStyle=`rgba(0,229,255,${v/255})`;
+      ctx.fillRect(i*bw,canvas.height-h,bw-1,h);
+    });
+  })();
+}
+
+function handleAudioUpload(input) {
+  uploadedBlob = input.files[0];
+  document.getElementById('uploadFileName').innerHTML = `✅ <strong>${uploadedBlob.name}</strong>`;
+}
+
+function clearAll() {
+  recordedBlob = uploadedBlob = null;
+  document.getElementById('micStatus').textContent = 'Click to start recording';
+  document.getElementById('uploadFileName').innerHTML = 'Drop audio file or click<br/><strong>WAV, MP3, WebM supported</strong>';
+  document.getElementById('resultBox').innerHTML = '<div class="placeholder-text">Record or upload audio,<br/>then click Predict</div>';
+}
+
+// ── PREDICT ──────────────────────────────────────────────────
+async function sendPredict() {
+  const audio = uploadedBlob || recordedBlob;
+  if (!audio) { toast('Record or upload audio first', 'error'); return; }
+  const btn = document.getElementById('predictBtn');
+  btn.disabled = true; btn.textContent = '⏳ Predicting...';
+  document.getElementById('resultBox').innerHTML = '<div class="placeholder-text">⏳ Analysing audio...</div>';
+
+  const fd = new FormData();
+  fd.append('audio', audio, 'recording.webm');
+  fd.append('speaker', document.getElementById('speakerName').value || 'Unknown');
+
+  try {
+    const r = await fetch(`${API_URL}/predict`, {method:'POST', body:fd});
+    const d = await r.json();
+    if (d.error) { toast(d.error, 'error'); return; }
+    showResult(d);
+    loadHistory();
+  } catch(e) { toast('Cannot connect to backend', 'error'); }
+  finally { btn.disabled=false; btn.textContent='Predict Keyword'; }
+}
+
+function showResult(d) {
+  const pct = (d.confidence*100).toFixed(1);
+  const engineClass = (d.engine||'').toLowerCase().includes('whisper') ? 'whisper' : 'cnn';
+  const engineLabel = (d.engine||'unknown').toUpperCase();
+  const watchAlert  = d.in_watchlist
+    ? `<div class="watchlist-alert">🚨 WATCHLIST ALERT — "${d.keyword}" is in your watchlist!</div>` : '';
+  const transcript  = d.transcript
+    ? `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px;">Whisper heard: "${d.transcript}"</div>` : '';
+
+  let predsHtml = '';
+  if (d.all_predictions && Object.keys(d.all_predictions).length > 0) {
+    predsHtml = '<div class="all-preds">' +
+      Object.entries(d.all_predictions).sort((a,b)=>b[1]-a[1]).map(([kw,conf])=>
+        `<div class="pred-row">
+          <span class="pred-kw">${kw}</span>
+          <div class="pred-bar-wrap"><div class="pred-bar" style="width:${(conf*100).toFixed(0)}%"></div></div>
+          <span class="pred-pct">${(conf*100).toFixed(0)}%</span>
+        </div>`
+      ).join('') + '</div>';
+  }
+
+  document.getElementById('resultBox').innerHTML = `
+    <div class="result-keyword">${d.keyword.toUpperCase()}</div>
+    <div class="result-confidence">${pct}% confidence · Alert L${d.alert_level}</div>
+    <div class="confidence-bar"><div class="confidence-fill" style="width:${pct}%"></div></div>
+    <span class="engine-tag ${engineClass}">${engineLabel}</span>
+    ${watchAlert}${transcript}${predsHtml}`;
+
+  document.getElementById('statTotal').textContent =
+    parseInt(document.getElementById('statTotal').textContent||0)+1;
+}
+
+// ── WATCHLIST ────────────────────────────────────────────────
+async function addToWatchlist() {
+  const kw = document.getElementById('watchlistInput').value.trim().toLowerCase();
+  if (!kw) { toast('Enter a keyword', 'error'); return; }
+  try {
+    const r = await fetch(`${API_URL}/watchlist/add`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({keyword: kw})
+    });
+    const d = await r.json();
+    if (d.error) { toast(d.error,'error'); return; }
+    toast(`"${kw}" added to watchlist — Whisper will detect it instantly!`, 'success');
+    document.getElementById('watchlistInput').value = '';
+    renderWatchlist(d.watchlist);
+    document.getElementById('statWatch').textContent = d.watchlist.length;
+  } catch(e) { toast('Failed: '+e.message,'error'); }
+}
+
+async function removeFromWatchlist(kw) {
+  try {
+    const r = await fetch(`${API_URL}/watchlist/remove`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({keyword: kw})
+    });
+    const d = await r.json();
+    renderWatchlist(d.watchlist);
+    document.getElementById('statWatch').textContent = d.watchlist.length;
+    toast(`"${kw}" removed from watchlist`, 'info');
+  } catch {}
+}
+
+function renderWatchlist(list) {
+  const el = document.getElementById('watchlistDisplay');
+  if (!el) return;
+  if (!list || !list.length) {
+    el.innerHTML = '<div class="placeholder-text">No words in watchlist yet.<br/>Add any word — no audio samples needed!</div>';
+    return;
+  }
+  el.innerHTML = list.map(w =>
+    `<span class="watchlist-chip">${w}<button onclick="removeFromWatchlist('${w}')">×</button></span>`
+  ).join('');
+}
+
+function renderCnnKeywords(kws) {
+  const el = document.getElementById('cnnKeywordsDisplay');
+  if (!el) return;
+  el.innerHTML = kws.map(k => `<span class="kw-chip cnn-kw">${k}</span>`).join('');
+}
+
+// ── SEARCH ───────────────────────────────────────────────────
+function handleSearchUpload(input) {
+  searchBlob = input.files[0];
+  document.getElementById('searchUploadText').innerHTML = `✅ <strong>${searchBlob.name}</strong><br/>${(searchBlob.size/1024/1024).toFixed(2)} MB`;
+  document.getElementById('searchZone').style.borderColor = 'var(--accent3)';
+}
+
+async function runSearch() {
+  if (!searchBlob) { toast('Upload an audio file first', 'error'); return; }
+  const kw  = document.getElementById('searchKeyword').value.trim().toLowerCase();
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true; btn.textContent = '⏳ Transcribing with Whisper...';
+  document.getElementById('searchResults').style.display = 'none';
+
+  const fd = new FormData();
+  fd.append('audio', searchBlob, 'search.wav');
+  fd.append('keyword', kw);
+
+  try {
+    const r = await fetch(`${API_URL}/search_keyword`, {method:'POST', body:fd});
+    const d = await r.json();
+    if (d.error) { toast(d.error,'error'); return; }
+    showSearchResults(d, kw);
+  } catch(e) { toast('Search failed: '+e.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='🔍 Search in Audio'; }
+}
+
+function showSearchResults(d, kw) {
+  const box     = document.getElementById('searchResults');
+  const content = document.getElementById('searchResultsContent');
+  box.style.display = 'block';
+
+  const badge = kw && d.found
+    ? `<div class="found-badge yes">✅ Found "${kw}" — ${d.count} time(s)</div>`
+    : kw && !d.found
+    ? `<div class="found-badge no">❌ "${kw}" not found in this audio</div>`
+    : `<div class="found-badge yes">✅ Transcription complete</div>`;
+
+  const lang = d.language_detected
+    ? `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:12px;">Language detected: <strong style="color:var(--accent)">${d.language_detected}</strong></div>` : '';
+
+  const detections = (d.detections||[]).map(det =>
+    `<div class="detection-item">
+      <div>
+        <div style="font-size:15px;font-weight:700;">${det.word}</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--accent);">⏱ ${det.time_label || det.time_sec+'s'}</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--accent3);">${((det.confidence||0)*100).toFixed(0)}%</div>
+    </div>`
+  ).join('');
+
+  const transcript = d.full_transcript
+    ? `<div style="margin-top:16px;"><div class="input-label" style="margin-bottom:8px;">Full Transcript</div>
+       <div class="transcript-box">${d.full_transcript}</div></div>` : '';
+
+  content.innerHTML = badge + lang + detections + transcript;
+  if (d.found) toast(`Found "${kw}" ${d.count} time(s)!`, 'success');
+}
+
+// ── TRAIN ────────────────────────────────────────────────────
+function handleSampleFiles(input) {
+  sampleFiles = Array.from(input.files);
+  document.getElementById('sampleText').innerHTML =
+    `✅ <strong>${sampleFiles.length} files selected</strong>`;
+}
+
+async function addKeywordWatchlistOnly() {
+  const kw = document.getElementById('newKeyword').value.trim().toLowerCase();
+  if (!kw) { toast('Enter a keyword name', 'error'); return; }
+  const btn = document.getElementById('addWatchBtn');
+  btn.disabled = true;
+  try {
+    const r = await fetch(`${API_URL}/watchlist/add`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({keyword: kw})
+    });
+    const d = await r.json();
+    toast(`"${kw}" added to watchlist! Whisper will detect it immediately — no training needed.`, 'success');
+    document.getElementById('addKwMsg').textContent = d.message || `"${kw}" is now being monitored.`;
+    document.getElementById('newKeyword').value = '';
+    checkStatus();
+  } catch(e) { toast('Failed: '+e.message,'error'); }
+  finally { btn.disabled=false; }
+}
+
+async function addKeywordWithTraining() {
+  const kw = document.getElementById('newKeyword').value.trim().toLowerCase();
+  if (!kw) { toast('Enter a keyword name', 'error'); return; }
+  const btn = document.getElementById('addTrainBtn');
+  btn.disabled = true; btn.textContent = '⏳ Uploading...';
+
+  const fd = new FormData();
+  fd.append('keyword', kw);
+  fd.append('auto_train', 'true');
+  sampleFiles.forEach(f => fd.append('audio', f, f.name));
+
+  try {
+    const r = await fetch(`${API_URL}/add_keyword`, {method:'POST', body:fd});
+    const d = await r.json();
+    if (d.error) { toast(d.error,'error'); return; }
+    toast(d.message, 'success');
+    document.getElementById('addKwMsg').textContent = d.message;
+    document.getElementById('newKeyword').value = '';
+    sampleFiles = [];
+    if (d.cnn_retrain_started) { startTrainPoll(); }
+    checkStatus();
+  } catch(e) { toast('Failed: '+e.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='☁️ Upload & Retrain CNN'; }
+}
+
+async function triggerRetrain() {
+  if (!confirm('Retrain CNN model with all current data?')) return;
+  try {
+    await fetch(`${API_URL}/retrain`, {method:'POST',
+      headers:{'Content-Type':'application/json'}, body:JSON.stringify({})});
+    toast('CNN retraining started!', 'success');
+    startTrainPoll();
+  } catch(e) { toast('Failed: '+e.message,'error'); }
+}
+
+function startTrainPoll() {
+  if (trainPoll) clearInterval(trainPoll);
+  trainPoll = setInterval(pollTrainStatus, 2000);
+}
+
+async function pollTrainStatus() {
+  try {
+    const r = await fetch(`${API_URL}/train_status`);
+    const d = await r.json();
+    const msg = document.getElementById('trainMsg');
+    const bar = document.getElementById('trainBar');
+    const pct = document.getElementById('trainPct');
+    if(msg) msg.textContent = d.message||'Idle';
+    if(bar) bar.style.width = (d.progress||0)+'%';
+    if(pct) pct.textContent = (d.progress||0)+'%';
+    if (!d.running && trainPoll) {
+      clearInterval(trainPoll); trainPoll=null;
+      if(d.last_accuracy) toast(`✅ CNN training complete! Accuracy: ${d.last_accuracy}%`,'success');
+    }
+  } catch {}
+}
+
+// ── HISTORY ──────────────────────────────────────────────────
+async function loadHistory() {
+  try {
+    const r = await fetch(`${API_URL}/history?limit=30`);
+    const d = await r.json();
+    const tbody = document.getElementById('historyBody');
+    if(!d.history||!d.history.length){
+      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px;">No predictions yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = d.history.map(h=>{
+      const ac = h.alert_level>=4?'al4':h.alert_level>=3?'al3':'al1';
+      const engClass = (h.engine||'').toLowerCase().includes('whisper')?'whisper':'cnn';
+      return `<tr>
+        <td>${new Date(h.timestamp).toLocaleTimeString()}</td>
+        <td><strong>${h.keyword}</strong></td>
+        <td style="color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${h.transcript||'—'}</td>
+        <td>${(h.confidence*100).toFixed(1)}%</td>
+        <td><span class="engine-tag ${engClass}" style="font-size:9px;">${(h.engine||'—').toUpperCase()}</span></td>
+        <td>${h.speaker||'—'}</td>
+        <td><span class="alert-badge ${ac}">L${h.alert_level}</span></td>
+      </tr>`;
+    }).join('');
+    document.getElementById('statTotal').textContent = d.history.length;
+    document.getElementById('statAlerts').textContent = d.history.filter(h=>h.alert_level>=4).length;
+  } catch {}
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+function toast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className=`toast ${type}`; el.textContent=msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s';
+    setTimeout(()=>el.remove(),300); }, 4500);
+}
+</script>
+</body>
+</html>
