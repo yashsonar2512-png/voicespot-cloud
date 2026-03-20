@@ -1,0 +1,12 @@
+voicespot-cloud/
+├── backend/
+│   ├── app.py          ← the NEW app.py from this chat
+│   └── model/
+│       └── keyword_model.keras  ← your trained model
+├── frontend/
+│   ├── app.html        ← the fixed app.html
+│   ├── index.html
+│   ├── Aboutus.html
+│   └── faq.html
+├── requirements.txt
+└── Procfile
