@@ -125,7 +125,7 @@
         How do I start the VoiceSpot backend?
         <div class="faq-chevron">▼</div>
       </button>
-      <div class="faq-answer"><div class="faq-answer-inner"><p>Navigate to your backend folder and run <code>python app.py</code>. The server starts on <code>http://localhost:5000</code>. Make sure you have all dependencies installed first with <code>python -m pip install flask flask-cors tensorflow librosa soundfile numpy</code>.</p></div></div>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>Navigate to your backend folder and run <code>python app.py</code>. The server starts on <code>https://voicespot-cloud-xrew.onrender.com</code>. Make sure you have all dependencies installed first with <code>python -m pip install flask flask-cors tensorflow librosa soundfile numpy</code>.</p></div></div>
     </div>
 
     <div class="faq-item" data-cat="setup">
@@ -133,7 +133,7 @@
         Why does the frontend show "Backend Offline"?
         <div class="faq-chevron">▼</div>
       </button>
-      <div class="faq-answer"><div class="faq-answer-inner"><p>This means the frontend can't reach <code>http://localhost:5000</code>. Make sure <code>python app.py</code> is running in a terminal. Also, open <code>index.html</code> via a local server (e.g. <code>python -m http.server 3000</code>) rather than double-clicking the file, as browsers block API calls from <code>file://</code> URLs.</p></div></div>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>This means the frontend can't reach <code>https://voicespot-cloud-xrew.onrender.com</code>. Make sure <code>python app.py</code> is running in a terminal. Also, open <code>index.html</code> via a local server (e.g. <code>python -m http.server 3000</code>) rather than double-clicking the file, as browsers block API calls from <code>file://</code> URLs.</p></div></div>
     </div>
 
     <div class="faq-item" data-cat="setup">
@@ -199,7 +199,7 @@
         Why does my browser ask for microphone permission?
         <div class="faq-chevron">▼</div>
       </button>
-      <div class="faq-answer"><div class="faq-answer-inner"><p>VoiceSpot records audio directly from your microphone using the browser's <code>MediaRecorder API</code>. This requires explicit permission. The audio is only sent to your local backend at <code>localhost:5000</code> and is never transmitted to any external server.</p></div></div>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>VoiceSpot records audio directly from your microphone using the browser's <code>MediaRecorder API</code>. This requires explicit permission. The audio is only sent to your local backend at <code>https://voicespot-cloud-xrew.onrender.com</code> and is never transmitted to any external server.</p></div></div>
     </div>
 
     <div class="faq-item" data-cat="audio">
