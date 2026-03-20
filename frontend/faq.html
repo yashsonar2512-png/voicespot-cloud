@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VoiceSpot — FAQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #080b10; --surface: #0d1117; --surface2: #131920; --border: #1e2a35;
+    --accent: #00e5ff; --accent2: #7c3aed; --accent3: #10b981;
+    --danger: #ef4444; --warn: #f59e0b; --text: #e2e8f0; --muted: #4a5568;
+    --mono: 'Space Mono', monospace; --sans: 'Syne', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden; }
+  body::before { content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0; }
+  .orb { position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:0.15; }
+  .orb1 { width:600px;height:600px;background:var(--accent2);top:-200px;right:-100px; }
+  .orb2 { width:400px;height:400px;background:var(--accent);bottom:-100px;left:-100px; }
+
+  .navbar { position:sticky;top:0;z-index:100;background:rgba(8,11,16,0.9);border-bottom:1px solid var(--border);backdrop-filter:blur(20px); }
+  .nav-inner { max-width:1400px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px; }
+  .nav-logo { display:flex;align-items:center;gap:10px;text-decoration:none; }
+  .nav-logo .logo-icon { width:32px;height:32px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px; }
+  .nav-logo .logo-text { font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.5px; }
+  .nav-logo .logo-text span { color:var(--accent); }
+  .nav-links { display:flex;align-items:center;gap:4px; }
+  .nav-link { padding:7px 16px;border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;transition:all 0.2s;letter-spacing:0.5px;text-transform:uppercase; }
+  .nav-link:hover { color:var(--text);background:var(--surface2); }
+  .nav-link.active { color:var(--accent);background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.15); }
+
+  .wrapper { position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px; }
+
+  .page-tag { font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:12px; }
+  .page-title { font-size:48px;font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px; }
+  .page-title span { color:var(--accent); }
+  .page-sub { font-size:16px;color:var(--muted);max-width:600px;line-height:1.6;margin-bottom:40px; }
+
+  /* Category filter */
+  .faq-filters { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px; }
+  .faq-filter { padding:8px 18px;border-radius:999px;font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.5px; }
+  .faq-filter:hover { color:var(--text);border-color:rgba(0,229,255,0.3); }
+  .faq-filter.active { color:var(--accent);background:rgba(0,229,255,0.08);border-color:rgba(0,229,255,0.3); }
+
+  /* FAQ accordion */
+  .faq-section { margin-bottom:32px; }
+  .faq-section-label { font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;padding-left:4px; }
+
+  .faq-item { background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color 0.2s; }
+  .faq-item:hover { border-color:rgba(0,229,255,0.15); }
+  .faq-item.open { border-color:rgba(0,229,255,0.25); }
+
+  .faq-question {
+    width:100%;padding:20px 24px;
+    display:flex;align-items:center;justify-content:space-between;
+    background:none;border:none;color:var(--text);
+    font-family:var(--sans);font-size:15px;font-weight:600;
+    cursor:pointer;text-align:left;gap:16px;
+    transition:background 0.15s;
+  }
+  .faq-question:hover { background:rgba(0,229,255,0.02); }
+  .faq-chevron { width:20px;height:20px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.3s;font-size:10px;color:var(--muted); }
+  .faq-item.open .faq-chevron { transform:rotate(180deg);border-color:var(--accent);color:var(--accent); }
+
+  .faq-answer { max-height:0;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1); }
+  .faq-answer-inner { padding:0 24px 20px;font-size:14px;color:var(--muted);line-height:1.8;border-top:1px solid var(--border); }
+  .faq-answer-inner p { padding-top:16px; }
+  .faq-answer-inner code { background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-family:var(--mono);font-size:12px;color:var(--accent); }
+  .faq-answer-inner a { color:var(--accent);text-decoration:none; }
+  .faq-answer-inner a:hover { text-decoration:underline; }
+
+  /* Contact CTA */
+  .contact-box { background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;margin-top:40px;position:relative;overflow:hidden; }
+  .contact-box::before { content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent)); }
+  .contact-title { font-size:22px;font-weight:700;margin-bottom:10px; }
+  .contact-sub { color:var(--muted);font-size:14px;margin-bottom:24px; }
+  .contact-btn { display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;border-radius:10px;color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.3s; }
+  .contact-btn:hover { transform:translateY(-2px);box-shadow:0 8px 25px rgba(124,58,237,0.4); }
+
+  @media(max-width:700px) { .page-title{font-size:32px} }
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">🎙️</div>
+      <div class="logo-text">Voice<span>Spot</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="app.html" class="nav-link">Dashboard</a>
+      <a href="Aboutus.html" class="nav-link">About Us</a>
+      <a href="faq.html" class="nav-link active">FAQ</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrapper">
+
+  <div class="page-tag">// Support</div>
+  <h1 class="page-title">Frequently Asked <span>Questions</span></h1>
+  <p class="page-sub">Everything you need to know about setting up, running, and using VoiceSpot.</p>
+
+  <!-- Filters -->
+  <div class="faq-filters">
+    <button class="faq-filter active" onclick="filterFAQ('all', this)">All</button>
+    <button class="faq-filter" onclick="filterFAQ('setup', this)">Setup</button>
+    <button class="faq-filter" onclick="filterFAQ('model', this)">Model</button>
+    <button class="faq-filter" onclick="filterFAQ('audio', this)">Audio</button>
+    <button class="faq-filter" onclick="filterFAQ('features', this)">Features</button>
+    <button class="faq-filter" onclick="filterFAQ('errors', this)">Errors</button>
+  </div>
+
+  <!-- Setup -->
+  <div class="faq-section" data-category="setup">
+    <div class="faq-section-label">Setup & Installation</div>
+
+    <div class="faq-item" data-cat="setup">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        How do I start the VoiceSpot backend?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>Navigate to your backend folder and run <code>python app.py</code>. The server starts on <code>http://localhost:5000</code>. Make sure you have all dependencies installed first with <code>python -m pip install flask flask-cors tensorflow librosa soundfile numpy</code>.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="setup">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Why does the frontend show "Backend Offline"?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>This means the frontend can't reach <code>http://localhost:5000</code>. Make sure <code>python app.py</code> is running in a terminal. Also, open <code>index.html</code> via a local server (e.g. <code>python -m http.server 3000</code>) rather than double-clicking the file, as browsers block API calls from <code>file://</code> URLs.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="setup">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Do I need an internet connection to use VoiceSpot?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>No. VoiceSpot runs entirely on your local machine. All inference, speaker verification, and data storage happens locally. No audio is ever sent to external servers. The only internet requirement is loading Google Fonts for the UI styling.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="setup">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        How do I install ffmpeg on Windows?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>Download the latest build from <a href="https://www.gyan.dev/ffmpeg/builds/" target="_blank">gyan.dev/ffmpeg/builds</a>. Extract it and copy <code>ffmpeg.exe</code>, <code>ffprobe.exe</code>, and <code>ffplay.exe</code> to <code>C:\ffmpeg\bin\</code>. Then add <code>C:\ffmpeg\bin</code> to your Windows PATH environment variable and restart your terminal. Verify with <code>ffmpeg -version</code>.</p></div></div>
+    </div>
+  </div>
+
+  <!-- Model -->
+  <div class="faq-section" data-category="model">
+    <div class="faq-section-label">Model & Accuracy</div>
+
+    <div class="faq-item" data-cat="model">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        What keywords can VoiceSpot detect?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>VoiceSpot supports 8 keywords: <code>yes</code>, <code>no</code>, <code>up</code>, <code>down</code>, <code>left</code>, <code>right</code>, <code>stop</code>, and <code>go</code>. These were chosen from Google's Speech Commands dataset for their practical utility in voice-controlled applications.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="model">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        How accurate is the model?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>The CNN model achieves approximately 92–95% accuracy on the validation set. Real-world accuracy depends on microphone quality, background noise, and how clearly you speak. Speaking in a quiet environment close to the microphone gives the best results.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="model">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        What is the model input format?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>The model expects a mel-spectrogram of shape <code>(124, 193, 1)</code> — 124 mel frequency bands over 193 time frames, representing 1 second of audio at 16kHz. The spectrogram is computed using <code>n_fft=512</code>, <code>hop_length=83</code>, and <code>fmax=8000</code>.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="model">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Can I add more keywords?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>Yes, but you'll need to retrain the model. Collect audio samples for your new keywords, add them to the training script, update the <code>KEYWORDS</code> list in <code>app.py</code>, and run <code>python train.py</code>. The model architecture supports any number of classes.</p></div></div>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <div class="faq-section" data-category="audio">
+    <div class="faq-section-label">Audio & Recording</div>
+
+    <div class="faq-item" data-cat="audio">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Why does my browser ask for microphone permission?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>VoiceSpot records audio directly from your microphone using the browser's <code>MediaRecorder API</code>. This requires explicit permission. The audio is only sent to your local backend at <code>localhost:5000</code> and is never transmitted to any external server.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="audio">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        How long should I record for best results?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>The model is trained on 1-second clips. Click the microphone, say your keyword clearly, and click stop — all within about 1 second. If you record longer, only the first second is used. Short, crisp recordings outperform long, rambling ones.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="audio">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Why does my browser send webm audio instead of wav?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>The browser's <code>MediaRecorder API</code> defaults to <code>audio/webm</code> format on most browsers (Chrome, Firefox, Edge). VoiceSpot's backend handles this automatically by using ffmpeg to decode the webm before processing. This is why ffmpeg must be installed.</p></div></div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="faq-section" data-category="features">
+    <div class="faq-section-label">Features</div>
+
+    <div class="faq-item" data-cat="features">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        How does speaker enrollment work?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>Record a voice clip, type your name, and click Enroll. VoiceSpot extracts a 40-coefficient MFCC vector from your audio and stores it as your voice "fingerprint". Enrolling 3+ times improves accuracy as the system averages your embeddings for a better voice profile.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="features">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        What does the Alert Level mean?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>Alert level reflects the model's confidence: Level 1 (below 50%) is very uncertain, Level 2 (50–69%) is low confidence, Level 3 (70–84%) is medium, Level 4 (85–94%) is high, and Level 5 (95%+) is maximum confidence. Higher alert levels mean the model is more certain about the detected keyword.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="features">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        Where is prediction history stored?
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>All predictions are saved in a SQLite database at <code>backend/predictions.db</code>. Each record stores the timestamp, keyword, confidence score, speaker name, and alert level. You can view aggregated stats per keyword in the Analytics tab.</p></div></div>
+    </div>
+  </div>
+
+  <!-- Errors -->
+  <div class="faq-section" data-category="errors">
+    <div class="faq-section-label">Troubleshooting Errors</div>
+
+    <div class="faq-item" data-cat="errors">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        I get a 500 Internal Server Error on /predict
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>Check the terminal where <code>app.py</code> is running for a full traceback. Common causes: (1) ffmpeg not installed — audio can't be decoded. (2) Shape mismatch — spectrogram dimensions don't match model input. (3) Model not loaded — check that <code>keyword_model.keras</code> exists in the <code>model/</code> folder.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="errors">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        ModuleNotFoundError: No module named 'tensorflow.python.trackable'
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>This is a version mismatch between TensorFlow and the standalone Keras package. Fix it by running: <code>python -m pip uninstall keras tensorflow -y</code> then <code>python -m pip install tensorflow==2.18.0</code>. TF 2.18 bundles the correct Keras version.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="errors">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        audioread.exceptions.NoBackendError
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>ffmpeg is not installed or not found in PATH. Install it from <a href="https://www.gyan.dev/ffmpeg/builds/" target="_blank">gyan.dev</a>, add it to <code>C:\ffmpeg\bin</code>, and add that path to your system's PATH environment variable. Alternatively, add <code>os.environ["PATH"] = r"C:\ffmpeg\bin" + os.pathsep + os.environ.get("PATH", "")</code> at the top of <code>app.py</code>.</p></div></div>
+    </div>
+
+    <div class="faq-item" data-cat="errors">
+      <button class="faq-question" onclick="toggleFAQ(this)">
+        ValueError: expected axis -1 of input shape to have value X
+        <div class="faq-chevron">▼</div>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner"><p>The spectrogram shape doesn't match what the model was trained with. Check your model's input shape with <code>print(model.input_shape)</code> and update <code>N_MELS</code>, <code>HOP_LENGTH</code>, and <code>N_TIME</code> in <code>app.py</code> to match. The hard-clamp in <code>_make_spectrogram()</code> handles off-by-one differences automatically.</p></div></div>
+    </div>
+<script>
+function toggleFAQ(btn) {
+  const item = btn.closest('.faq-item');
+  const answer = item.querySelector('.faq-answer');
+  const isOpen = item.classList.contains('open');
+
+  // Close all
+  document.querySelectorAll('.faq-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.faq-answer').style.maxHeight = '0';
+  });
+
+  // Open clicked if it was closed
+  if (!isOpen) {
+    item.classList.add('open');
+    answer.style.maxHeight = answer.scrollHeight + 'px';
+  }
+}
+
+function filterFAQ(category, btn) {
+  document.querySelectorAll('.faq-filter').forEach(f => f.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('.faq-section').forEach(section => {
+    if (category === 'all') {
+      section.style.display = 'block';
+    } else {
+      section.style.display = section.dataset.category === category ? 'block' : 'none';
+    }
+  });
+}
+</script>
+</body>
+</html>
