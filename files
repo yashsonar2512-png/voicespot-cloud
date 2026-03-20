@@ -1,15 +1,14 @@
 voicespot-cloud/
-│
-├── backend/
-│   ├── app.py
-│   └── model/
-│       └── keyword_model.keras
-│
-├── frontend/
-│   ├── app.html
-│   ├── index.html
-│   ├── Aboutus.html
-│   └── faq.html
-│
-├── requirements.txt   
-├── Procfile          
+  .python-version
+  requirements.txt
+  Procfile
+  backend/
+    app.py
+    __init__.py
+    model/
+      keyword_model.keras
+  frontend/
+    app.html
+    index.html
+    Aboutus.html
+    faq.html   
